@@ -1,0 +1,51 @@
+﻿[dotenv@17.2.3] injecting env (3) from backend\.env -- tip: ≡ا¤ prevent building .env in docker: https://dotenvx.com/prebuild
+DEBUG: DATABASE_URL: postgresql://neondb_owner:npg_zgE5WrmGP1yN@ep-steep-river-a4xr2o18-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+npx : E:\Projects\Green-Oasis
+\green-oasis-store\node_modul
+es\@prisma\client\src\runtime
+\getPrismaClient.ts:239
+At line:1 char:1
++ npx tsx 
+backend/prisma/seed.ts 2>&1 
+| Out-File -FilePath 
+seed_error.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (E:\Proj  
+  ects\Gre...maClient.ts:2   
+ 39:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+      config = optionsArg.__i
+nternal?.configOverride?.(con
+fig) ?? config
+                          ^
+
+
+TypeError: Cannot read 
+properties of undefined 
+(reading '__internal')
+    at new t (E:\Projects\Gre
+en-Oasis\green-oasis-store\no
+de_modules\@prisma\client\src
+\runtime\getPrismaClient.ts:2
+39:27)
+    at <anonymous> (E:\Projec
+ts\Green-Oasis\green-oasis-st
+ore\backend\prisma\seed.ts:15
+:16)
+    at ModuleJob.run (node:in
+ternal/modules/esm/module_job
+:263:25)
+    at async 
+ModuleLoader.import (node:int
+ernal/modules/esm/loader:540:
+24)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5)
+
+Node.js v20.19.4

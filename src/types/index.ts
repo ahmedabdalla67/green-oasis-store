@@ -3,15 +3,17 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  weight: string;
-  category: 'seedlings' | 'ready-plants' | 'herbs';
-  image: string;
-  benefits: string[];
-  usage: string;
-  medicalAdvice: string;
-  agricultureAdvice: string;
-  wateringAdvice: string;
-  stock: number;
+  weight: number;
+  category: string;
+  imageUrl?: string;
+  image?: string; // Maintained for compatibility if needed, but backend uses imageUrl
+  benefits?: string[];
+  usage?: string;
+  medicalAdvice?: string;
+  agricultureAdvice?: string;
+  wateringAdvice?: string;
+  availableStock: number;
+  stock?: number;
 }
 
 export interface CartItem {

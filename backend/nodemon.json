@@ -3,5 +3,5 @@
         "src"
     ],
     "ext": "ts",
-    "exec": "npx tsx src/server.ts"
+    "exec": "npx ts-node --transpile-only src/server.ts"
 }

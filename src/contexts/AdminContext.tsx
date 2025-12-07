@@ -1,42 +1,47 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { apiRequest } from '@/lib/api';
 
 interface AdminContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  token: string | null;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123',
-};
-
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    const saved = localStorage.getItem('adminAuth');
-    return saved === 'true';
-  });
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const isAuthenticated = !!token;
 
   useEffect(() => {
-    localStorage.setItem('adminAuth', String(isAuthenticated));
-  }, [isAuthenticated]);
-
-  const login = (username: string, password: string) => {
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-      setIsAuthenticated(true);
-      return true;
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
     }
-    return false;
+  }, [token]);
+
+  const login = async (username: string, password: string) => {
+    try {
+      const data = await apiRequest('/auth/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
+      setToken(data.token);
+      return true;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
+    }
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
+    setToken(null);
   };
 
   return (
-    <AdminContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AdminContext.Provider value={{ isAuthenticated, login, logout, token }}>
       {children}
     </AdminContext.Provider>
   );

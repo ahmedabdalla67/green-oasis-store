@@ -1,17 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { z } from 'zod';
-
-const prisma = new PrismaClient();
-
-const productSchema = z.object({
-    name: z.string(),
-    category: z.string(),
-    description: z.string(),
-    price: z.string().transform((val) => parseFloat(val)),
-    weight: z.string().transform((val) => parseFloat(val)),
-    availableStock: z.string().transform((val) => parseInt(val, 10)),
-});
+import prisma from '../lib/prisma';
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
@@ -35,38 +23,61 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { name, category, description, price, weight, availableStock } = productSchema.parse(req.body);
-        const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+        console.log('Incoming product data:', req.body);
+        console.log('Incoming file:', req.file);
+
+        const { name, category, description, price, weight, availableStock, stock, imageUrl, image } = req.body;
+
+        if (!name || !category) {
+            return res.status(400).json({ error: 'name and category are required' });
+        }
+
+        const finalImageUrl = req.file ? `/uploads/${req.file.filename}` : (imageUrl || image || '');
 
         const product = await prisma.product.create({
             data: {
                 name,
                 category,
-                description,
-                price,
-                weight,
-                availableStock,
-                imageUrl,
+                description: description || '',
+                price: parseFloat(price) || 0,
+                weight: parseFloat(weight) || 0,
+                availableStock: parseInt(availableStock || stock || '0', 10),
+                imageUrl: finalImageUrl,
             },
         });
+        console.log('Product created successfully:', product);
         res.status(201).json(product);
     } catch (error) {
-        res.status(400).json({ error: 'Failed to create product', details: error });
+        console.error('Product creation error:', error);
+        res.status(400).json({ error: 'Failed to create product', details: String(error) });
     }
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const data = productSchema.partial().parse(req.body);
-        const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+        const { name, category, description, price, weight, availableStock, stock, imageUrl, image } = req.body;
+
+        const updateData: Record<string, unknown> = {};
+        if (name) updateData.name = name;
+        if (category) updateData.category = category;
+        if (description !== undefined) updateData.description = description;
+        if (price !== undefined) updateData.price = parseFloat(price);
+        if (weight !== undefined) updateData.weight = parseFloat(weight);
+        if (availableStock !== undefined || stock !== undefined) {
+            updateData.availableStock = parseInt(availableStock || stock || '0', 10);
+        }
+
+        const finalImageUrl = req.file ? `/uploads/${req.file.filename}` : (imageUrl || image);
+        if (finalImageUrl) updateData.imageUrl = finalImageUrl;
 
         const product = await prisma.product.update({
             where: { id },
-            data: { ...data, ...(imageUrl && { imageUrl }) },
+            data: updateData,
         });
         res.json(product);
     } catch (error) {
+        console.error('Product update error:', error);
         res.status(400).json({ error: 'Failed to update product' });
     }
 };

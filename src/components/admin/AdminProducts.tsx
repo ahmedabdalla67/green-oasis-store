@@ -21,7 +21,7 @@ export function AdminProducts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -62,15 +62,15 @@ export function AdminProducts() {
         name: product.name,
         description: product.description,
         price: String(product.price),
-        weight: product.weight,
-        category: product.category,
-        image: product.image,
-        benefits: product.benefits.join('، '),
-        usage: product.usage,
-        medicalAdvice: product.medicalAdvice,
-        agricultureAdvice: product.agricultureAdvice,
-        wateringAdvice: product.wateringAdvice,
-        stock: String(product.stock),
+        weight: String(product.weight || ''),
+        category: product.category as 'seedlings' | 'ready-plants' | 'herbs',
+        image: product.image || product.imageUrl || '',
+        benefits: (product.benefits || []).join('، '),
+        usage: product.usage || '',
+        medicalAdvice: product.medicalAdvice || '',
+        agricultureAdvice: product.agricultureAdvice || '',
+        wateringAdvice: product.wateringAdvice || '',
+        stock: String(product.stock || product.availableStock || 0),
       });
     } else {
       resetForm();
@@ -94,8 +94,8 @@ export function AdminProducts() {
       name: formData.name,
       description: formData.description,
       price: Number(formData.price),
-      weight: formData.weight,
-      category: formData.category,
+      weight: Number(formData.weight) || 0,
+      category: formData.category as 'seedlings' | 'ready-plants' | 'herbs',
       image: formData.image || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400',
       benefits: formData.benefits.split('،').map(b => b.trim()).filter(Boolean),
       usage: formData.usage,
@@ -103,6 +103,7 @@ export function AdminProducts() {
       agricultureAdvice: formData.agricultureAdvice,
       wateringAdvice: formData.wateringAdvice,
       stock: Number(formData.stock) || 0,
+      availableStock: Number(formData.stock) || 0,
     };
 
     if (editingProduct) {
@@ -124,7 +125,7 @@ export function AdminProducts() {
     }
   };
 
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = products.filter(p =>
     p.name.includes(searchQuery) || p.description.includes(searchQuery)
   );
 
@@ -224,7 +225,7 @@ export function AdminProducts() {
                 <Label>القسم *</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value: 'seedlings' | 'ready-plants' | 'herbs') => 
+                  onValueChange={(value: 'seedlings' | 'ready-plants' | 'herbs') =>
                     setFormData(prev => ({ ...prev, category: value }))
                   }
                 >

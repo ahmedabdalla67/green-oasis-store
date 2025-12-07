@@ -65,9 +65,11 @@ model OrderItem {
 }
 
 model ShippingZone {
-  id          String   @id @default(uuid())
-  governorate String   @unique
-  cost        Decimal
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(uuid())
+  governorate    String   @unique
+  areas          String[] @default([])  // Cities/areas within the governorate
+  cost           Decimal
+  addressDetails String?  // Optional detailed address notes
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

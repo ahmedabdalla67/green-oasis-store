@@ -413,3 +413,50 @@ Delete table  → Remove model → migrate
 ```
 
 **Remember**: Always run migrations after schema changes! 🚀
+
+---
+
+## 📊 Data Management & Control
+
+### 1. **Visual Management (Prisma Studio)**
+
+The easiest way to view, add, edit, and delete data is using Prisma Studio.
+
+```bash
+npm run prisma:studio
+```
+
+- Opens a web interface at `http://localhost:5555`
+- You can double-click cells to edit
+- Click "Add record" to create new entries
+- Select rows and click "Delete" to remove them
+- **Save changes** by clicking the green "Save" button
+
+### 2. **Seeding Initial Data**
+
+We have created a seed script to populate your database with essential data (Admin, Shipping Zones, Sample Products).
+
+**To run the seed script:**
+```bash
+npx prisma db seed
+```
+
+This will:
+- Create default Shipping Zones (Cairo, Giza, Alexandria)
+- Create an Admin user (username: `admin`, password: `adminpassword123`)
+- Add sample Products
+
+**When to use:**
+- After resetting the database (`npx prisma migrate reset`)
+- When setting up the project for the first time
+
+### 3. **Resetting the Database**
+
+If you want to wipe everything and start fresh:
+
+```bash
+cd backend
+npx prisma migrate reset
+```
+*Note: This will delete all data, run migrations, and then automatically run the seed script.*
+
