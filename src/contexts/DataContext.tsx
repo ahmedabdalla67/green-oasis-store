@@ -76,37 +76,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setProducts(transformedProducts);
         setShippingZones(shippingData);
 
-        // Fetch orders - try admin endpoint first, fallback to user orders
-        // Note: In a real app, this should probably be in a separate AdminDataProvider or similar
-        try {
-          // Try admin orders first (will fail if not admin)
-          const ordersData = await apiRequest('/orders/all');
-          // Transform backend format to frontend format
-          const transformedOrders = ordersData.map((order: any) => ({
-            id: order.id,
-            customerName: order.user?.name || extractCustomerName(order.shippingAddress) || 'Guest',
-            phone: order.user?.phone || extractPhone(order.shippingAddress) || '',
-            address: order.shippingAddress || '',
-            governorate: order.governorate || '',
-            area: extractArea(order.shippingAddress) || '',
-            items: order.items?.map((item: any) => ({
-              product: item.product,
-              quantity: item.quantity
-            })) || [],
-            totalAmount: Number(order.totalPrice) || 0,
-            shippingCost: Number(order.deliveryCost) || 0,
-            paymentMethod: order.paymentMethod || 'cash',
-            status: order.status || 'pending',
-            createdAt: new Date(order.createdAt),
-          }));
-          setOrders(transformedOrders);
-        } catch (e) {
-          console.log('Could not fetch admin orders, trying user orders');
+        // Fetch orders - only if authenticated
+        const token = localStorage.getItem('token');
+        if (token) {
           try {
-            const ordersData = await apiRequest('/orders/my-orders');
-            setOrders(ordersData);
-          } catch (e2) {
-            // Ignore auth error for public users
+            // Try admin orders first (will fail if not admin)
+            const ordersData = await apiRequest('/orders/all');
+            // Transform backend format to frontend format
+            const transformedOrders = ordersData.map((order: any) => ({
+              id: order.id,
+              customerName: order.user?.name || extractCustomerName(order.shippingAddress) || 'Guest',
+              phone: order.user?.phone || extractPhone(order.shippingAddress) || '',
+              address: order.shippingAddress || '',
+              governorate: order.governorate || '',
+              area: extractArea(order.shippingAddress) || '',
+              items: order.items?.map((item: any) => ({
+                product: item.product,
+                quantity: item.quantity
+              })) || [],
+              totalAmount: Number(order.totalPrice) || 0,
+              shippingCost: Number(order.deliveryCost) || 0,
+              paymentMethod: order.paymentMethod || 'cash',
+              status: order.status || 'pending',
+              createdAt: new Date(order.createdAt),
+            }));
+            setOrders(transformedOrders);
+          } catch (e) {
+            console.log('Could not fetch admin orders, trying user orders');
+            try {
+              const ordersData = await apiRequest('/orders/my-orders');
+              setOrders(ordersData);
+            } catch (e2) {
+              // Ignore auth error for public users
+            }
           }
         }
 
