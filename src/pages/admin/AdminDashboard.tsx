@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Package, ShoppingCart, MapPin, Settings, LogOut, 
+import {
+  Package, ShoppingCart, MapPin, Settings, LogOut,
   Leaf, Menu, X, MessageSquare, TrendingUp
 } from 'lucide-react';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -23,10 +23,13 @@ const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Redirect if not authenticated
-  if (!isAuthenticated) {
-    navigate('/admin');
-    return null;
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin');
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (!isAuthenticated) return null;
 
   const handleLogout = () => {
     logout();
@@ -90,8 +93,8 @@ const AdminDashboard = () => {
                   className={`
                     w-full flex items-center gap-3 px-4 py-3 rounded-lg
                     transition-colors font-medium
-                    ${isActive 
-                      ? 'bg-primary text-primary-foreground' 
+                    ${isActive
+                      ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-secondary text-foreground/80'
                     }
                   `}
@@ -129,7 +132,7 @@ const AdminDashboard = () => {
 
       {/* Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-foreground/20 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
